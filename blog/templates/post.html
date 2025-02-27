@@ -1,0 +1,203 @@
+{% extends "layout.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<div class="post-detail-container">
+    <!-- Blog Yazısı -->
+    <article class="content-section">
+        <div class="post-header">
+            <h1 class="display-4 text-center mb-3">{{ post.title }}</h1>
+            <div class="post-meta text-center">
+                <a href="{{ url_for('users.profile', username=post.author.username) }}" class="me-3">
+                    <i class="fas fa-user me-1"></i>{{ post.author.username }}
+                </a>
+                <span class="mx-3">
+                    <i class="fas fa-calendar-alt me-1"></i>{{ post.date_posted.strftime('%d %B %Y') }}
+                </span>
+                <span class="mx-3">
+                    <i class="far fa-eye me-1"></i>{{ post.views }} görüntülenme
+                </span>
+                <span class="mx-3">
+                    {% if current_user.is_authenticated %}
+                        <button class="btn btn-like {{ 'liked' if post.is_liked_by(current_user) }}" onclick="likePost({{ post.id }})">
+                            <i class="fas fa-heart me-1"></i>
+                            <span class="like-count">{{ post.like_count() }}</span>
+                        </button>
+                    {% else %}
+                        <i class="far fa-heart me-1"></i>
+                        <span class="like-count">{{ post.like_count() }}</span> beğeni
+                    {% endif %}
+                </span>
+                <span class="mx-3">
+                    <i class="far fa-comment me-1"></i>{{ post.comment_count() }} yorum
+                </span>
+            </div>
+        </div>
+        <div class="post-content">
+            {% if post.image_file != 'default_post.jpg' %}
+            <div class="post-image mb-4">
+                <img src="{{ url_for('static', filename='post_images/' + post.image_file) }}" class="img-fluid rounded" alt="{{ post.title }}">
+            </div>
+            {% endif %}
+            <div class="article-content">
+                {{ post.content | safe }}
+            </div>
+            {% if post.author == current_user %}
+                <div class="post-actions text-center mt-4">
+                    <a class="btn btn-outline-secondary" href="{{ url_for('main.update_post', post_id=post.id) }}">
+                        <i class="fas fa-edit me-1"></i>Düzenle
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash me-1"></i>Sil
+                    </button>
+                </div>
+            {% endif %}
+            <div class="dropdown d-inline-block ms-2">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-download me-1"></i>Dışa Aktar
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="{{ url_for('main.export_post', post_id=post.id, format='pdf') }}" target="_blank">
+                            <i class="fas fa-file-pdf me-2"></i>PDF olarak indir
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </article>
+
+    <!-- Yorum Bölümü -->
+    <div class="content-section mt-4">
+        <h3 class="mb-4"><i class="far fa-comments me-2"></i>Yorumlar ({{ post.comment_count() }})</h3>
+        
+        {% if current_user.is_authenticated %}
+            <div class="comment-form mb-4">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.content.label(class="form-control-label") }}
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control is-invalid", rows="3") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control", rows="3", placeholder="Yorumunuzu yazın...") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group mt-3">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Yorum yapabilmek için lütfen <a href="{{ url_for('auth.login') }}">giriş yapın</a>.
+            </div>
+        {% endif %}
+
+        <!-- Yorumlar Listesi -->
+        <div class="comments-list">
+            {% for comment in post.comments %}
+                <div class="comment mb-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="comment-meta">
+                            <a href="{{ url_for('users.profile', username=comment.author.username) }}" class="fw-bold text-decoration-none">
+                                {{ comment.author.username }}
+                            </a>
+                            <small class="text-muted ms-2">
+                                {{ comment.date_posted.strftime('%d %B %Y, %H:%M') }}
+                            </small>
+                        </div>
+                        {% if comment.author == current_user %}
+                            <div class="comment-actions">
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ comment.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="comment-content mt-2">
+                        {{ comment.content }}
+                    </div>
+                </div>
+
+                <!-- Yorum Silme Modalı -->
+                {% if comment.author == current_user %}
+                    <div class="modal fade" id="deleteCommentModal{{ comment.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Yorumu Sil</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Bu yorumu silmek istediğinizden emin misiniz?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                    <form action="{{ url_for('main.delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline">
+                                        <input type="submit" class="btn btn-danger" value="Sil">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    Henüz yorum yapılmamış. İlk yorumu siz yapın!
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Yazı Silme Modalı -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yazıyı Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bu yazıyı silmek istediğinizden emin misiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form action="{{ url_for('main.delete_post', post_id=post.id) }}" method="POST" class="d-inline">
+                    <input type="submit" class="btn btn-danger" value="Sil">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Beğeni işlemi için JavaScript -->
+<script>
+function likePost(postId) {
+    fetch(`/post/${postId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likeButton = document.querySelector('.btn-like');
+        const likeCount = document.querySelector('.like-count');
+        
+        likeCount.textContent = data.likes;
+        
+        if (data.status === 'liked') {
+            likeButton.classList.add('liked');
+        } else {
+            likeButton.classList.remove('liked');
+        }
+    });
+}
+</script>
+{% endblock content %} 

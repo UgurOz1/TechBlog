@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="" enctype="multipart/form-data" id="post-form">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">{{ legend }}</legend>
+                <div class="form-group mb-3">
+                    {{ form.title.label(class="form-control-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control") }}
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.content.label(class="form-control-label") }}
+                    <div id="editor-container">
+                        <div id="editor"></div>
+                    </div>
+                    {{ form.content(style="display: none;", id="content-input") }}
+                    {% if form.content.errors %}
+                        <div class="invalid-feedback" style="display: block;">
+                            {% for error in form.content.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.image.label(class="form-control-label") }}
+                    {% if form.image.errors %}
+                        {{ form.image(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.image.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.image(class="form-control") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                <button type="button" class="btn btn-outline-info" onclick="submitForm()">{{ form.submit.label.text }}</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    var quill;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var toolbarOptions = [
+            [{ 'header': [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'align': [] }],
+            ['link', 'image'],
+            ['clean']
+        ];
+
+        quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: toolbarOptions
+            },
+            placeholder: 'İçeriğinizi buraya yazın...',
+            formats: [
+                'header',
+                'bold', 'italic', 'underline', 'strike',
+                'color', 'background',
+                'list', 'bullet',
+                'align',
+                'link', 'image'
+            ]
+        });
+
+        // Eğer mevcut içerik varsa, editöre yükle
+        var contentInput = document.getElementById('content-input');
+        if (contentInput && contentInput.value) {
+            quill.root.innerHTML = contentInput.value;
+        }
+    });
+
+    function submitForm() {
+        var content = document.getElementById('content-input');
+        var editorContent = quill.root.innerHTML.trim();
+        
+        if (!editorContent || editorContent === '<p><br></p>') {
+            alert('Lütfen içerik alanını doldurun.');
+            return;
+        }
+        
+        content.value = editorContent;
+        document.getElementById('post-form').submit();
+    }
+</script>
+{% endblock scripts %} 

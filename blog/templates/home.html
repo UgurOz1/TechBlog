@@ -1,0 +1,480 @@
+{% extends "layout.html" %}
+{% block title %}Ana Sayfa{% endblock %}
+{% block content %}
+<style>
+    /* Üst ve alt kısım için yeni stiller */
+    .navbar {
+        background-color: #1a1a1a !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand, .nav-link {
+        color: #ffffff !important;
+    }
+    
+    .nav-link:hover {
+        color: #3498db !important;
+    }
+    
+    .content-section {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        background: white;
+        overflow: hidden;
+    }
+    .content-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .article-title a {
+        color: #2c3e50;
+        text-decoration: none;
+        transition: color 0.2s;
+        font-weight: 600;
+        font-size: 1.25rem;
+        line-height: 1.4;
+    }
+    .article-title a:hover {
+        color: #3498db;
+    }
+    .post-image {
+        position: relative;
+        overflow: hidden;
+        height: 200px;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+    .post-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .post-image:hover img {
+        transform: scale(1.1);
+    }
+    .post-info {
+        font-size: 0.9rem;
+    }
+    .post-info a {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+    .post-info a:hover {
+        color: #3498db;
+    }
+    .post-stats {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        padding: 0.5rem 0;
+        border-top: 1px solid #f1f1f1;
+    }
+    .post-stats i {
+        color: #3498db;
+    }
+    .read-more {
+        color: #3498db;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    .read-more:hover {
+        color: #2980b9;
+        text-decoration: none;
+        transform: translateX(5px);
+    }
+    .read-more i {
+        transition: transform 0.2s;
+    }
+    .read-more:hover i {
+        transform: translateX(3px);
+    }
+    .article-content {
+        color: #555;
+        line-height: 1.6;
+        margin: 1rem 0;
+    }
+    .post-actions .btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    .post-actions .btn i {
+        font-size: 0.75rem;
+    }
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .post-meta a {
+        color: #2c3e50;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    .post-meta a:hover {
+        color: #3498db;
+    }
+    .post-meta i {
+        color: #3498db;
+        font-size: 0.9rem;
+    }
+    .post-meta .date {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: #95a5a6;
+    }
+    .post-content {
+        flex: 1;
+    }
+    .post-meta-divider {
+        color: #dee2e6;
+        margin: 0 0.5rem;
+    }
+    .sidebar-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        background: white;
+        margin-bottom: 1.5rem;
+        padding: 1.25rem;
+    }
+    .sidebar-card h5 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .category-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        margin: 0.25rem;
+        border-radius: 20px;
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .category-badge:hover {
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+    }
+    .popular-post {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .popular-post:last-child {
+        border-bottom: none;
+    }
+    .popular-post a {
+        color: #2c3e50;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .popular-post a:hover {
+        color: #3498db;
+    }
+    .popular-post .post-meta {
+        font-size: 0.8rem;
+        color: #95a5a6;
+    }
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    .post-author {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .post-author .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3498db;
+        font-size: 1.2rem;
+    }
+    .post-author .author-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .post-author .author-name {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 1.2;
+        transition: color 0.2s;
+    }
+    .post-author .author-name:hover {
+        color: #3498db;
+        text-decoration: none;
+    }
+    .post-date {
+        color: #95a5a6;
+        font-size: 0.85rem;
+    }
+    .social-card {
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #ffffff, #f5f5f5);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .social-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .social-card .card-title {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .social-links {
+        padding: 0.5rem 0;
+    }
+
+    .social-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .social-link i {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .social-link span {
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0.8;
+    }
+
+    .social-link.github {
+        color: #333;
+    }
+
+    .social-link.github:hover {
+        background: #333;
+        color: white;
+    }
+
+    .social-link.linkedin {
+        color: #0077b5;
+    }
+
+    .social-link.linkedin:hover {
+        background: #0077b5;
+        color: white;
+    }
+
+    .social-link:hover {
+        transform: translateY(-3px);
+    }
+
+    .social-link:hover i {
+        transform: scale(1.1);
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-8">
+        {% for post in posts.items %}
+            <article class="content-section mb-4">
+                <div class="row g-0">
+                    {% if post.image_file != 'default_post.jpg' %}
+                    <div class="col-md-4 p-3">
+                        <div class="d-flex flex-column">
+                            <a href="{{ url_for('main.post', post_id=post.id) }}" class="post-image d-block">
+                                <img src="{{ url_for('static', filename='post_images/' + post.image_file) }}" 
+                                    alt="{{ post.title }} - TechBlog"
+                                    title="{{ post.title }}"
+                                    loading="lazy">
+                            </a>
+                            <div class="post-meta mt-4">
+                                <a href="{{ url_for('users.profile', username=post.author.username) }}">
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ post.author.username }}
+                                </a>
+                                <span class="date">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ post.date_posted.strftime('%d %B %Y') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-{% if post.image_file != 'default_post.jpg' %}8{% else %}12{% endif %} p-3">
+                        <div class="d-flex flex-column h-100">
+                            {% if post.image_file == 'default_post.jpg' %}
+                            <div class="post-meta">
+                                <a href="{{ url_for('users.profile', username=post.author.username) }}">
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ post.author.username }}
+                                </a>
+                                <span class="date">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ post.date_posted.strftime('%d %B %Y') }}
+                                </span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="post-content">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h2 class="article-title mb-0">
+                                        <a href="{{ url_for('main.post', post_id=post.id) }}">{{ post.title }}</a>
+                                    </h2>
+                                    {% if post.author == current_user %}
+                                    <div class="post-actions">
+                                        <a class="btn btn-sm btn-outline-primary rounded-pill" 
+                                           href="{{ url_for('main.update_post', post_id=post.id) }}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" 
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal{{ post.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="article-content">
+                                    {% set content = post.content | striptags | truncate(150) %}
+                                    {{ content }}
+                                    {% if post.content|length > 150 %}
+                                    <a href="{{ url_for('main.post', post_id=post.id) }}" class="read-more">
+                                        Devamını Oku <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="post-stats mt-auto">
+                                    <div class="d-flex gap-4">
+                                        <span>
+                                            <i class="far fa-eye me-1"></i>
+                                            {{ post.views }} görüntülenme
+                                        </span>
+                                        <span>
+                                            <i class="far fa-heart me-1"></i>
+                                            {{ post.like_count() }} beğeni
+                                        </span>
+                                        <span>
+                                            <i class="far fa-comment me-1"></i>
+                                            {{ post.comment_count() }} yorum
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Silme Onay Modalı -->
+            <div class="modal fade" id="deleteModal{{ post.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Yazıyı Sil</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            Bu yazıyı silmek istediğinizden emin misiniz?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <form action="{{ url_for('main.delete_post', post_id=post.id) }}" method="POST" class="d-inline">
+                                <input type="submit" class="btn btn-danger" value="Sil">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <!-- Sayfalama -->
+        <div class="pagination-container text-center mt-4">
+            {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    {% if posts.page == page_num %}
+                        <a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+                    {% else %}
+                        <a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                    <span class="btn btn-outline-secondary mb-4 disabled">...</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- Kategoriler -->
+        
+
+        <!-- Popüler Yazılar -->
+        <div class="sidebar-card">
+            <h5><i class="fas fa-fire me-2"></i>Popüler Yazılar</h5>
+            {% for post in posts.items[:5] %}
+            <div class="popular-post">
+                <a href="{{ url_for('main.post', post_id=post.id) }}">{{ post.title }}</a>
+                <div class="post-meta mt-1">
+                    <i class="far fa-eye me-1"></i>{{ post.views }} görüntülenme
+                    <i class="far fa-heart ms-2 me-1"></i>{{ post.like_count() }} beğeni
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Etiket Bulutu -->
+        
+
+        <!-- Sosyal Medya -->
+        <div class="card social-card mb-4">
+            <div class="card-body text-center">
+                <h5 class="card-title mb-4">
+                    <i class="fas fa-users me-2"></i>Bizi Takip Edin
+                </h5>
+                <div class="social-links d-flex justify-content-center gap-4">
+                    <a href="https://github.com/UgurOz1" target="_blank" class="social-link github">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/u%C4%9Fur-%C3%B6zcan-494885246/" target="_blank" class="social-link linkedin">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} 

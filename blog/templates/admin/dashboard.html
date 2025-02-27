@@ -1,0 +1,190 @@
+{% extends "admin/layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<!-- İstatistik Kartları -->
+<div class="row">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="h3 mb-0 font-weight-bold">{{ total_users }}</div>
+                        <div class="text-white-50 small">Toplam Kullanıcı</div>
+                    </div>
+                    <div class="icon-circle bg-white bg-opacity-25">
+                        <i class="fas fa-users fa-2x text-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{{ url_for('admin.user_list') }}">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="h3 mb-0 font-weight-bold">{{ total_posts }}</div>
+                        <div class="text-white-50 small">Toplam Blog Yazısı</div>
+                    </div>
+                    <div class="icon-circle bg-white bg-opacity-25">
+                        <i class="fas fa-file-alt fa-2x text-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{{ url_for('admin.post_list') }}">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="h3 mb-0 font-weight-bold">{{ total_comments }}</div>
+                        <div class="text-white-50 small">Toplam Yorum</div>
+                    </div>
+                    <div class="icon-circle bg-white bg-opacity-25">
+                        <i class="fas fa-comments fa-2x text-white"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="#">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Son Aktiviteler -->
+<div class="row">
+    <!-- Son Kayıt Olan Kullanıcılar -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Son Kayıt Olan Kullanıcılar</h6>
+                <a href="{{ url_for('admin.user_list') }}" class="btn btn-sm btn-primary">
+                    Tümünü Gör
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı Adı</th>
+                                <th>Email</th>
+                                <th>Kayıt Tarihi</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users[-5:] %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('users.profile', username=user.username) }}" class="text-primary font-weight-bold">
+                                        {{ user.username }}
+                                    </a>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.join_date.strftime('%d.%m.%Y %H:%M') }}</td>
+                                <td>
+                                    {% if user.is_admin %}
+                                        <span class="badge bg-primary">Admin</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Kullanıcı</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Son Eklenen Blog Yazıları -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Son Eklenen Blog Yazıları</h6>
+                <a href="{{ url_for('admin.post_list') }}" class="btn btn-sm btn-primary">
+                    Tümünü Gör
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Başlık</th>
+                                <th>Yazar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in recent_posts %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('main.post', post_id=post.id) }}" class="text-primary font-weight-bold">
+                                        {{ post.title }}
+                                    </a>
+                                </td>
+                                <td>{{ post.author.username }}</td>
+                                <td>{{ post.date_posted.strftime('%d.%m.%Y %H:%M') }}</td>
+                                <td>
+                                    {% if post.is_visible %}
+                                        <span class="badge bg-success">Görünür</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Gizli</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.icon-circle {
+    height: 4rem;
+    width: 4rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-opacity-25 {
+    --bs-bg-opacity: 0.25;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.table td, .table th {
+    white-space: nowrap;
+}
+
+.font-weight-bold {
+    font-weight: 600;
+}
+</style>
+{% endblock content %} 

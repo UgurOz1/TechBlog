@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title mb-4">İletişim</h1>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h5>Bize Ulaşın</h5>
+                    <p>
+                        <i class="fas fa-envelope me-2"></i> Email: uguro9319@gmail.com<br>
+                        
+                    </p>
+                    
+                </div>
+                <div class="col-md-6">
+                    <h5>Bize Mesaj Gönderin</h5>
+                    <form method="POST" class="mt-3">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" placeholder="Adınız" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" name="email" placeholder="E-posta" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="subject" placeholder="Konu" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" name="message" rows="5" placeholder="Mesajınız" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Gönder
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} 
