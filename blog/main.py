@@ -16,7 +16,10 @@ from flask_mail import Message
 main = Blueprint('main', __name__)
 
 # wkhtmltopdf konfigürasyonu
-config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+if os.name == 'nt':  # Windows
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+else:  # Linux/Render
+    config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
 
 def save_post_image(form_image):
     if form_image:

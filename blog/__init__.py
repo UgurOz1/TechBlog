@@ -15,7 +15,10 @@ app = Flask(__name__)
 
 # Uygulama yapılandırmaları
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'gelistirme-icin-gizli-anahtar')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///blog.db')
+# Render PostgreSQL için URI düzeltmesi (postgres:// -> postgresql://)
+if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Veritabanı bağlantısını oluştur
@@ -46,11 +49,6 @@ app.register_blueprint(admin_blueprint)
 
 # Modelleri içe aktar
 from blog import models
-
-# Veritabanını oluştur
-with app.app_context():
-    db.create_all()
-    print("Veritabanı tabloları oluşturuldu!")
 
 migrate = Migrate(app, db)
 

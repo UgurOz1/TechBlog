@@ -1,0 +1,9 @@
+venv/
+.env
+__pycache__/
+*.pyc
+instance/
+blog.db
+static/post_images/*
+!static/post_images/.gitkeep
+.vscode/
